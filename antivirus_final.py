@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, hashlib, zlib, StringIO
+import sys, hashlib, zlib, StringIO, imp
 import scanmod, curemod
 
 VirusDB = []
@@ -20,7 +20,7 @@ def DecodeKMD(fname):
     fmd5 = buf[-32:]
     
     f = buf2
-    for i in range(3):
+    for _ in range(3):
       md5 = hashlib.md5()
       md5.update(f)
       f = md5.hexdigest()
@@ -58,7 +58,7 @@ def MakeVirusDB():
     v = pattern.split(':')
     
     scan_func = v[0]
-    cure_func = v[1]
+    # cure_func = v[1]
     if scan_func == 'ScanMD5':
       t.append(v[3])
       t.append(v[4])
@@ -83,7 +83,15 @@ if __name__ == '__main__':
   
   fname = sys.argv[1]
   
-  ret, vname = scanmod.ScanVirus(vdb, vsize, sdb, fname)
+  try:
+    m = 'scanmod'
+    f, filename, desc = imp.find_module(m, [''])
+    module = imp.load_module(m, f, filename, desc)
+    cmd = 'ret, vname = module.ScanVirus(vdb, vsize, sdb, fname)'
+    exec cmd
+  except ImportError:
+    ret, vname = scanmod.ScanVirus(vdb, vsize, sdb, fname)
+  
   if ret == True:
     print("%s : %s" %(fname, vname))
     curemod.CureDelete(fname)

@@ -37,6 +37,8 @@ def ScanStr(fp, offset, mal_str):
     return False
 
 def ScanVirus(vdb, vsize, sdb, fname):
+  print("[*] New ScanVirus")
+  
   # md5 해시 이용
   ret, vname = ScanMD5(vdb, vsize, fname)
   if ret == True:
